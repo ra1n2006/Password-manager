@@ -1,0 +1,49 @@
+"""Консольный интерфейс менеджера паролей"""
+
+import re
+import sys
+from getpass import getpass
+
+from .crypto import generate_password
+from .manager import PasswordManager
+from .storage import JsonStorage
+
+
+def cli() -> None:
+    """Функция, обрабатывающая команды из консоли, передающая введенные данные методам объекта класса PasswordManager"""
+
+    print("Доступные команды: add, list, get <name>, delete <name>, exit")
+    jsonStorage = JsonStorage("src/data/storage.json")
+    password_manager = PasswordManager(jsonStorage)
+    password_manager.initialize()
+    while 1:
+        cmd = input("Введите команду\n")
+        if cmd == "add":
+            service = input("Введите название сервиса\n").strip()
+            choice = input("Сгенерировать пароль? (да/нет)\n").strip().lower()
+
+            if choice == "да":
+                password = generate_password()
+                print(f"Сгенерированный пароль: {password}")
+            else:
+                password = input("Введите пароль\n")
+
+            password_manager.add_password(service, password)
+
+        elif cmd == "list":
+            for service in password_manager.list_services():
+                print(service)
+
+        elif re.fullmatch(r"get\s+.+", cmd):
+            name = re.fullmatch(r"get\s+(.+)", cmd).group(1).strip()
+            master_password = getpass("Подтвердите мастер-пароль\n")
+            print(password_manager.get_password(name, master_password))
+
+        elif re.fullmatch(r"delete\s+.+", cmd):
+            name = re.fullmatch(r"delete\s+(.+)", cmd).group(1).strip()
+            print(password_manager.delete_password(name))
+        elif cmd == "exit":
+            print("Работа завершена")
+            sys.exit()
+        else:
+            print("Неизвестная команда.\n")
