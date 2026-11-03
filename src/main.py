@@ -2,6 +2,7 @@
 
 from password_manager.cli import cli
 
+
 def main() -> None:
     try:
         cli()
