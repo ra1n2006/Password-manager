@@ -13,6 +13,10 @@ jobs:
         working-directory: Lab1
 
     steps:
+      - name: Show workspace
+        run: ls -la
+        working-directory: ${{ github.workspace }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
