@@ -10,9 +10,12 @@ jobs:
 
     defaults:
       run:
-        working-directory: C:\hse\prog\PythonLabs\Lab1
+        working-directory: Lab1
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
