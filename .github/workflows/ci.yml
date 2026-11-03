@@ -10,7 +10,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: Lab1
+        working-directory: C:\hse\prog\PythonLabs\Lab1
 
     steps:
       - name: Install uv
