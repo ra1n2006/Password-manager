@@ -7,7 +7,10 @@ authors = [
     { email = "dan@aa-a.ru" }
 ]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "cryptography>=50.0.2",
+    "python-dotenv>=1.2.4",
+]
 
 [project.scripts]
 password-manager = "password_manager:main"

@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet, InvalidToken
 from password_manager.crypto import (
     decrypt_password,
     encrypt_password,
+    generate_password,
     generate_salt,
     generateHashPassword,
 )
@@ -54,3 +55,10 @@ def test_master_password_hash_changes_with_password() -> None:
     second_hash = generateHashPassword("SecondPassword123!", salt)
 
     assert first_hash != second_hash
+
+
+def test_generate_password():
+    """Пароль длиной 16 нормально генерируется"""
+    pwd = generate_password()
+
+    assert len(pwd) == 16
