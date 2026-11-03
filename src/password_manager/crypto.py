@@ -1,20 +1,30 @@
-import os
-from dotenv import load_dotenv
-from pathlib import Path
 import hashlib
+import os
 import secrets
+import string
+from pathlib import Path
 
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
+
 
 def generate_salt() -> bytes:
     """Функция, генерирующая соль для хэша"""
 
     return secrets.token_bytes(16)
 
+
 def generateHashPassword(password: str, salt: bytes) -> str:
     """Функция, генерирующая хэш для пароля, с учетом соли"""
 
     return hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 600_000).hex()
+
+
+def generate_password() -> str:
+    """Генерация надежного пароля."""
+
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(16))
 
 
 def get_encryption_key() -> bytes:
@@ -31,6 +41,7 @@ def get_encryption_key() -> bytes:
             file.write(f"\nENCRYPTION_KEY={key}\n")
 
     return key.encode("utf-8")
+
 
 def encrypt_password(password: str, key: bytes) -> str:
     """Функция, реализующая шифрование пароля ключом из .env файла"""
