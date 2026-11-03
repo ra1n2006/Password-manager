@@ -56,7 +56,6 @@ def test_delete_missing_service():
     with tempfile.TemporaryDirectory() as temp_dir:
         filepath = Path(temp_dir) / "storage.json"
         storage = JsonStorage(str(filepath))
-
         try:
             storage.delete("google")
         except KeyError:
