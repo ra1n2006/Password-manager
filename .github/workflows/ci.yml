@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Show workspace
-        run: ls -la
+        run: pwd
         working-directory: ${{ github.workspace }}
 
       - name: Checkout repository
