@@ -31,6 +31,10 @@ def cli() -> None:
             password_manager.add_password(service, password)
 
         elif cmd == "list":
+            if not password_manager.list_services():
+                print("сохраненных сервисов нет")
+                continue
+            print("Сервисы:")
             for service in password_manager.list_services():
                 print(service)
 
