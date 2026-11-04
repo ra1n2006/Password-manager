@@ -9,13 +9,40 @@ from .manager import PasswordManager
 from .storage import JsonStorage
 
 
+def start_manager(password_manager: PasswordManager) -> bool:
+    """Создание мастер-пароля или вход в менеджер."""
+
+    if password_manager.check_master_password():
+        password = getpass("Введите мастер-пароль: ")
+    else:
+        print("Мастер-пароль еще не создан.")
+
+        password = getpass("Создайте мастер-пароль: ")
+        confirmation = getpass("Повторите мастер-пароль: ")
+
+        if password != confirmation:
+            print("Пароли не совпадают.")
+            return False
+
+        if not password_manager.initialize(password):
+            return False
+
+    if not password_manager.unlock(password):
+        print("Неверный мастер-пароль.")
+        return False
+
+    print("Менеджер разблокирован.")
+    return True
+
+
 def cli() -> None:
     """Функция, обрабатывающая команды из консоли, передающая введенные данные методам объекта класса PasswordManager"""
 
     print("Доступные команды: add, list, get <name>, delete <name>, exit")
     jsonStorage = JsonStorage("src/data/storage.json")
     password_manager = PasswordManager(jsonStorage)
-    password_manager.initialize()
+    if not start_manager(password_manager):
+        return
     while 1:
         cmd = input("Введите команду\n")
         if cmd == "add":
