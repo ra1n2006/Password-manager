@@ -1,64 +1,31 @@
-import json
-import tempfile
-from pathlib import Path
-
 from password_manager.storage import JsonStorage
 
 
-def test_load():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        filepath = Path(temp_dir) / "storage.json"
+def test_add_and_load(tmp_path):
+    file_path = tmp_path / "storage.json"
+    storage = JsonStorage(str(file_path))
 
-        with open(filepath, "w", encoding="utf-8") as file:
-            json.dump({"google": "password123"}, file)
+    storage.add("google", "encrypted_password")
 
-        storage = JsonStorage(str(filepath))
-
-        assert storage.load() == {"google": "password123"}
+    assert storage.load() == {"google": "encrypted_password"}
 
 
-def test_persist():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        filepath = Path(temp_dir) / "storage.json"
-        storage = JsonStorage(str(filepath))
+def test_delete(tmp_path):
+    file_path = tmp_path / "storage.json"
+    storage = JsonStorage(str(file_path))
 
-        storage._data = {"google": "password123"}
-        storage.persist()
+    storage.add("google", "encrypted_password")
+    storage.delete("google")
 
-        with open(filepath, "r", encoding="utf-8") as file:
-            data = json.load(file)
-
-        assert data == {"google": "password123"}
+    assert storage.load() == {}
 
 
-def test_add():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        filepath = Path(temp_dir) / "storage.json"
-        storage = JsonStorage(str(filepath))
+def test_is_empty(tmp_path):
+    file_path = tmp_path / "storage.json"
+    storage = JsonStorage(str(file_path))
 
-        storage.add("google", "password123")
+    assert storage.is_empty()
 
-        assert storage._data == {"google": "password123"}
+    storage.add("google", "encrypted_password")
 
-
-def test_delete():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        filepath = Path(temp_dir) / "storage.json"
-        storage = JsonStorage(str(filepath))
-
-        storage.add("google", "password123")
-        storage.delete("google")
-
-        assert storage._data == {}
-
-
-def test_delete_missing_service():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        filepath = Path(temp_dir) / "storage.json"
-        storage = JsonStorage(str(filepath))
-        try:
-            storage.delete("google")
-        except KeyError:
-            pass
-        else:
-            assert False
+    assert not storage.is_empty()

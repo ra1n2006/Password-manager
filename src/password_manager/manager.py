@@ -49,7 +49,7 @@ class PasswordManager:
         print("Мастер-пароль настроен.")
 
     def unlock(self, master_password: str) -> bool:
-        """Проверка мастер-пароля и разблокировка менеджера."""
+        """Проверка мастер-пароля"""
 
         with self._master_storage.open("r", encoding="utf-8") as file:
             master_key = json.load(file)
