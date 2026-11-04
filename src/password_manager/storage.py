@@ -6,6 +6,10 @@ class JsonStorage:
     def __init__(self, file_path: str) -> None:
         self._file_path = Path(file_path)
         self._data: dict[str, str] = {}
+        if not self._file_path.exists():
+            self._file_path.parent.mkdir(parents=True, exist_ok=True)
+            with self._file_path.open("w", encoding="utf-8") as file:
+                json.dump({}, file)
         self.load()
 
     def load(self) -> dict[str, str]:

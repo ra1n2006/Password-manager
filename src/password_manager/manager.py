@@ -16,6 +16,11 @@ class PasswordManager:
     def __init__(self, storage: JsonStorage) -> None:
         self._storage = storage
         self._master_storage = Path("src/data/master.json")
+        if not self._master_storage.exists():
+            self._master_storage.parent.mkdir(parents=True, exist_ok=True)
+
+            with self._master_storage.open("w", encoding="utf-8") as file:
+                json.dump({}, file)
         self._master_key: bytes | None = None
 
     def initialize(self, password: str) -> bool:
@@ -56,11 +61,14 @@ class PasswordManager:
 
     def check_master_password(self) -> bool:
         """Проверка, настроен ли мастер-пароль"""
+
         if not self._master_storage.exists():
             return False
 
         with self._master_storage.open("r", encoding="utf-8") as file:
-            return bool(file.read().strip())
+            data = json.load(file)
+
+        return bool(data.get("salt") and data.get("master_hash"))
 
     def add_password(self, service: str, password: str) -> None:
         """Добавление в json-файл сервиса и его пароля в зашифрованном виде"""

@@ -8,5 +8,6 @@ wheels/
 # Virtual environments
 .venv
 #
-src/data
+src/data/master.json
+src/data/storage.json
 .env
