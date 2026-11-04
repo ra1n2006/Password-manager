@@ -1,3 +1,5 @@
+"""Класс, преодставляющий взаимодействие с json-файлами"""
+
 import json
 from pathlib import Path
 

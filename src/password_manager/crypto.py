@@ -1,3 +1,5 @@
+"""Набор функций для шифрования и хэширования"""
+
 import hashlib
 import os
 import secrets
