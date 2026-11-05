@@ -77,8 +77,9 @@ class PasswordManager:
         """Добавление в json-файл сервиса и его пароля в зашифрованном виде"""
 
         self._storage.load()
-        self._storage.add(service, encrypt_password(password,
-                                                    get_encryption_key()))
+        self._storage.add(
+            service, encrypt_password(password, get_encryption_key())
+        )
 
     def list_services(self) -> dict[str, str]:
         """Вывести все сервисы, которые хранятся"""
@@ -93,8 +94,9 @@ class PasswordManager:
             return "Неверный мастер-пароль"
 
         if self._storage.load().get(service):
-            return decrypt_password(self._storage.load()[service],
-                                    get_encryption_key())
+            return decrypt_password(
+                self._storage.load()[service], get_encryption_key()
+            )
 
         return "сервис с таким именем не найден"
 
