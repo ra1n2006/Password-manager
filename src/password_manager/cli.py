@@ -36,11 +36,12 @@ def start_manager(password_manager: PasswordManager) -> bool:
 
 
 def cli() -> None:
-    """Функция, обрабатывающая команды из консоли, передающая введенные данные методам объекта класса PasswordManager"""
+    """Функция, обрабатывающая команды из консоли,
+    передающая введенные данные методам объекта класса PasswordManager"""
 
     print("Доступные команды: add, list, get <name>, delete <name>, exit")
-    jsonStorage = JsonStorage("src/data/storage.json")
-    password_manager = PasswordManager(jsonStorage)
+    json_storage = JsonStorage("src/data/storage.json")
+    password_manager = PasswordManager(json_storage)
     if not start_manager(password_manager):
         return
     while 1:

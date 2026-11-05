@@ -1,4 +1,5 @@
-"""Класс, объект которого выполняет основную логику, связанную с взаимодействием с хранилищем"""
+"""Класс, объект которого выполняет основную логику,
+связанную с взаимодействием с хранилищем"""
 
 import hmac
 import json
@@ -7,8 +8,8 @@ from pathlib import Path
 from .crypto import (
     decrypt_password,
     encrypt_password,
+    generate_hash_password,
     generate_salt,
-    generateHashPassword,
     get_encryption_key,
 )
 from .storage import JsonStorage
@@ -37,7 +38,7 @@ class PasswordManager:
             return False
 
         salt = generate_salt()
-        password_hash = generateHashPassword(password, salt)
+        password_hash = generate_hash_password(password, salt)
 
         with self._master_storage.open("w", encoding="utf-8") as file:
             json.dump({"salt": salt.hex(), "master_hash": password_hash}, file)
@@ -53,7 +54,7 @@ class PasswordManager:
 
         salt = bytes.fromhex(master_key["salt"])
         stored_hash = master_key["master_hash"]
-        password_hash = generateHashPassword(master_password, salt)
+        password_hash = generate_hash_password(master_password, salt)
 
         if not hmac.compare_digest(stored_hash, password_hash):
             return False
@@ -76,7 +77,8 @@ class PasswordManager:
         """Добавление в json-файл сервиса и его пароля в зашифрованном виде"""
 
         self._storage.load()
-        self._storage.add(service, encrypt_password(password, get_encryption_key()))
+        self._storage.add(service, encrypt_password(password,
+                                                    get_encryption_key()))
 
     def list_services(self) -> dict[str, str]:
         """Вывести все сервисы, которые хранятся"""
@@ -84,13 +86,15 @@ class PasswordManager:
         return self._storage.load()
 
     def get_password(self, service: str, master: str) -> str:
-        """Получить пароль конкретного сервиса после подтверждения мастер-ключом"""
+        """Получить пароль конкретного сервиса
+        после подтверждения мастер-ключом"""
 
         if not self.unlock(master):
             return "Неверный мастер-пароль"
 
         if self._storage.load().get(service):
-            return decrypt_password(self._storage.load()[service], get_encryption_key())
+            return decrypt_password(self._storage.load()[service],
+                                    get_encryption_key())
 
         return "сервис с таким именем не найден"
 

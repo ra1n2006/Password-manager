@@ -6,9 +6,9 @@ from cryptography.fernet import Fernet, InvalidToken
 from password_manager.crypto import (
     decrypt_password,
     encrypt_password,
+    generate_hash_password,
     generate_password,
     generate_salt,
-    generateHashPassword,
 )
 
 
@@ -41,8 +41,8 @@ def test_master_password_hash_is_repeatable_with_same_salt() -> None:
     """Один и тот же пароль и одна и та же соль выдают одинаковый хэш"""
     salt = generate_salt()
 
-    first_hash = generateHashPassword("MasterPassword123!", salt)
-    second_hash = generateHashPassword("MasterPassword123!", salt)
+    first_hash = generate_hash_password("MasterPassword123!", salt)
+    second_hash = generate_hash_password("MasterPassword123!", salt)
 
     assert first_hash == second_hash
 
@@ -51,8 +51,8 @@ def test_master_password_hash_changes_with_password() -> None:
     """Разные пароли и одинаковая соль выдают разный хэш"""
     salt = generate_salt()
 
-    first_hash = generateHashPassword("FirstPassword123!", salt)
-    second_hash = generateHashPassword("SecondPassword123!", salt)
+    first_hash = generate_hash_password("FirstPassword123!", salt)
+    second_hash = generate_hash_password("SecondPassword123!", salt)
 
     assert first_hash != second_hash
 

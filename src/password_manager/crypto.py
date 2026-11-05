@@ -16,10 +16,13 @@ def generate_salt() -> bytes:
     return secrets.token_bytes(16)
 
 
-def generateHashPassword(password: str, salt: bytes) -> str:
+def generate_hash_password(password: str, salt: bytes) -> str:
     """Функция, генерирующая хэш для пароля, с учетом соли"""
 
-    return hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 600_000).hex()
+    return hashlib.pbkdf2_hmac("sha256",
+                               password.encode("utf-8"),
+                               salt,
+                               600_000).hex()
 
 
 def generate_password() -> str:
@@ -30,7 +33,8 @@ def generate_password() -> str:
 
 
 def get_encryption_key() -> bytes:
-    """Функция, реализующая получение ключа шифрования из .env файла или его создание (в случае отсутствия)"""
+    """Функция, реализующая получение ключа шифрования из .env файла
+     или его создание (в случае отсутствия)"""
     env_path = Path(".env")
     load_dotenv(env_path)
 
@@ -47,9 +51,13 @@ def get_encryption_key() -> bytes:
 
 def encrypt_password(password: str, key: bytes) -> str:
     """Функция, реализующая шифрование пароля ключом из .env файла"""
-    return Fernet(key).encrypt(password.encode("utf-8")).decode("utf-8")
+    return (Fernet(key).
+            encrypt(password.encode("utf-8")).
+            decode("utf-8"))
 
 
 def decrypt_password(encrypted_password: str, key: bytes) -> str:
     """Функция, реализующая расшифрование пароля ключом из .env файла"""
-    return Fernet(key).decrypt(encrypted_password.encode("utf-8")).decode("utf-8")
+    return (Fernet(key).
+            decrypt(encrypted_password.encode("utf-8")).
+            decode("utf-8"))
