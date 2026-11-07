@@ -8,6 +8,7 @@ from password_manager.crypto import (
     encrypt_password,
     generate_hash_password,
     get_encryption_key,
+    generate_password,
     generate_salt,
 )
 
