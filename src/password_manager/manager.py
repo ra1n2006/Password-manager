@@ -2,7 +2,6 @@
 связанную с взаимодействием с хранилищем"""
 
 import hmac
-import json
 
 from .crypto import (
     decrypt_password,
