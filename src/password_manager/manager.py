@@ -79,9 +79,7 @@ class PasswordManager:
             print("Имя сервиса не может быть пустым")
             return
         self._storage.load()
-        self._storage.add(
-            service, encrypt_password(password, self._enc_key)
-        )
+        self._storage.add(service, encrypt_password(password, self._enc_key))
 
     def list_services(self) -> dict[str, str]:
         """Вывести все сервисы, которые хранятся"""

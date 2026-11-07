@@ -21,6 +21,7 @@ def get_encryption_key(password: str, salt: bytes) -> bytes:
 
     return base64.urlsafe_b64encode(key)
 
+
 def generate_salt() -> bytes:
     """Функция, генерирующая соль для хэша"""
 
