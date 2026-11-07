@@ -32,10 +32,13 @@ class PasswordManager:
 
         salt = generate_salt()
         password_hash = generate_hash_password(password, salt)
+        encryption_salt = generate_salt()
+        self._enc_key = get_encryption_key(password, encryption_salt)
 
         self._master_storage._data = {
             "salt": salt.hex(),
             "master_hash": password_hash,
+            "encryption_salt": encryption_salt.hex(),
         }
         self._master_storage.persist()
 
@@ -45,16 +48,23 @@ class PasswordManager:
     def unlock(self, master_password: str) -> bool:
         """Проверка мастер-пароля"""
 
-        master_key = self._master_storage.load()
+        master_data = self._master_storage.load()
 
-        salt = bytes.fromhex(master_key["salt"])
-        stored_hash = master_key["master_hash"]
+        salt = bytes.fromhex(master_data["salt"])
+        encryption_salt = bytes.fromhex(master_data["encryption_salt"])
+
+        stored_hash = master_data["master_hash"]
+
         password_hash = generate_hash_password(master_password, salt)
 
         if not hmac.compare_digest(stored_hash, password_hash):
             return False
 
-        self._enc_key = get_encryption_key()
+        self._enc_key = get_encryption_key(
+            master_password,
+            encryption_salt,
+        )
+
         return True
 
     def check_master_password(self) -> bool:
@@ -70,7 +80,7 @@ class PasswordManager:
             return
         self._storage.load()
         self._storage.add(
-            service, encrypt_password(password, get_encryption_key())
+            service, encrypt_password(password, self._enc_key)
         )
 
     def list_services(self) -> dict[str, str]:
@@ -87,7 +97,7 @@ class PasswordManager:
 
         if self._storage.load().get(service):
             return decrypt_password(
-                self._storage.load()[service], get_encryption_key()
+                self._storage.load()[service], self._enc_key
             )
 
         return "сервис с таким именем не найден"

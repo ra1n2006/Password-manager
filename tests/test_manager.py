@@ -58,6 +58,7 @@ def test_delete():
         manager = PasswordManager(storage)
         manager._master_storage = JsonStorage(temp_dir + "/master.json")
 
+        manager.initialize("master123")
         manager.add_password("google", "555")
         manager.delete_password("google")
 

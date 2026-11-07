@@ -21,17 +21,18 @@ def start_manager(password_manager: PasswordManager) -> bool:
         confirmation = getpass("Повторите мастер-пароль: ")
 
         if password != confirmation:
-            print("Пароли не совпадают.")
+            print("Пароли не совпадают")
             return False
 
         if not password_manager.initialize(password):
             return False
 
     if not password_manager.unlock(password):
-        print("Неверный мастер-пароль.")
+        print("Неверный мастер-пароль")
+        print("Работа завершена")
         return False
 
-    print("Менеджер разблокирован.")
+    print("Менеджер разблокирован")
     return True
 
 
@@ -78,4 +79,4 @@ def cli() -> None:
             print("Работа завершена")
             sys.exit()
         else:
-            print("Неизвестная команда.\n")
+            print("Неизвестная команда\n")

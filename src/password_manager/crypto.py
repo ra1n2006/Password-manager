@@ -1,14 +1,25 @@
 """Набор функций для шифрования и хэширования"""
 
+import base64
 import hashlib
-import os
 import secrets
 import string
-from pathlib import Path
 
 from cryptography.fernet import Fernet
-from dotenv import load_dotenv
 
+
+def get_encryption_key(password: str, salt: bytes) -> bytes:
+    """Получение ключа шифрования из мастер-пароля."""
+
+    key = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        salt,
+        600_000,
+        dklen=32,
+    )
+
+    return base64.urlsafe_b64encode(key)
 
 def generate_salt() -> bytes:
     """Функция, генерирующая соль для хэша"""
@@ -29,23 +40,6 @@ def generate_password() -> str:
 
     alphabet = string.ascii_letters + string.digits + string.punctuation
     return "".join(secrets.choice(alphabet) for _ in range(24))
-
-
-def get_encryption_key() -> bytes:
-    """Функция, реализующая получение ключа шифрования из .env файла
-    или его создание (в случае отсутствия)"""
-    env_path = Path(".env")
-    load_dotenv(env_path)
-
-    key = os.getenv("ENCRYPTION_KEY")
-
-    if key is None:
-        key = Fernet.generate_key().decode("utf-8")
-
-        with env_path.open("a", encoding="utf-8") as file:
-            file.write(f"\nENCRYPTION_KEY={key}\n")
-
-    return key.encode("utf-8")
 
 
 def encrypt_password(password: str, key: bytes) -> str:
