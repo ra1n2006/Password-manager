@@ -27,8 +27,8 @@ def generate_hash_password(password: str, salt: bytes) -> str:
 def generate_password() -> str:
     """Генерация надежного пароля."""
 
-    alphabet = string.ascii_letters + string.digits
-    return "".join(secrets.choice(alphabet) for _ in range(16))
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    return "".join(secrets.choice(alphabet) for _ in range(24))
 
 
 def get_encryption_key() -> bytes:

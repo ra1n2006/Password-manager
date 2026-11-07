@@ -3,7 +3,6 @@
 
 import hmac
 import json
-from pathlib import Path
 
 from .crypto import (
     decrypt_password,
@@ -18,13 +17,8 @@ from .storage import JsonStorage
 class PasswordManager:
     def __init__(self, storage: JsonStorage) -> None:
         self._storage = storage
-        self._master_storage = Path("src/data/master.json")
-        if not self._master_storage.exists():
-            self._master_storage.parent.mkdir(parents=True, exist_ok=True)
-
-            with self._master_storage.open("w", encoding="utf-8") as file:
-                json.dump({}, file)
-        self._master_key: bytes | None = None
+        self._master_storage = JsonStorage("src/data/master.json")
+        self._enc_key: bytes | None = None
 
     def initialize(self, password: str) -> bool:
         """Создание мастер-пароля, если он еще не задан."""
@@ -40,8 +34,11 @@ class PasswordManager:
         salt = generate_salt()
         password_hash = generate_hash_password(password, salt)
 
-        with self._master_storage.open("w", encoding="utf-8") as file:
-            json.dump({"salt": salt.hex(), "master_hash": password_hash}, file)
+        self._master_storage._data = {
+            "salt": salt.hex(),
+            "master_hash": password_hash,
+        }
+        self._master_storage.persist()
 
         print("Мастер-пароль настроен.")
         return True
@@ -49,8 +46,7 @@ class PasswordManager:
     def unlock(self, master_password: str) -> bool:
         """Проверка мастер-пароля"""
 
-        with self._master_storage.open("r", encoding="utf-8") as file:
-            master_key = json.load(file)
+        master_key = self._master_storage.load()
 
         salt = bytes.fromhex(master_key["salt"])
         stored_hash = master_key["master_hash"]
@@ -59,23 +55,20 @@ class PasswordManager:
         if not hmac.compare_digest(stored_hash, password_hash):
             return False
 
-        self._master_key = get_encryption_key()
+        self._enc_key = get_encryption_key()
         return True
 
     def check_master_password(self) -> bool:
         """Проверка, настроен ли мастер-пароль"""
-
-        if not self._master_storage.exists():
-            return False
-
-        with self._master_storage.open("r", encoding="utf-8") as file:
-            data = json.load(file)
+        data = self._master_storage.load()
 
         return bool(data.get("salt") and data.get("master_hash"))
 
     def add_password(self, service: str, password: str) -> None:
         """Добавление в json-файл сервиса и его пароля в зашифрованном виде"""
-
+        if service.strip() == "":
+            print("Имя сервиса не может быть пустым")
+            return
         self._storage.load()
         self._storage.add(
             service, encrypt_password(password, get_encryption_key())
